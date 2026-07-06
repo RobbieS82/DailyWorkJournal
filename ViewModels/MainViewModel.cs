@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Input;
 using DailyWorkJournal.Models;
 using DailyWorkJournal.Services;
+using DailyWorkJournal.Views;
 
 namespace DailyWorkJournal.ViewModels;
 
@@ -69,6 +70,7 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         NextWeekCommand = new RelayCommand(GoToNextWeek);
         GoToTodayCommand = new RelayCommand(GoToToday);
         SaveCommand = new RelayCommand(SaveAll);
+        ViewLogFileCommand = new RelayCommand(OpenLogFileViewer);
         NavigateToDateCommand = new RelayCommand(NavigateToDate);
 
         // Start auto-save
@@ -168,6 +170,9 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
 
     /// <summary>Saves all dirty entries in the current week.</summary>
     public ICommand SaveCommand { get; }
+
+    /// <summary>Opens the log file viewer window.</summary>
+    public ICommand ViewLogFileCommand { get; }
 
     /// <summary>
     /// Navigates to the week that contains a date passed as the command parameter.
@@ -289,6 +294,20 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(SelectedDate));
         RebuildWeekEntries();
         SelectedEntry = WeekEntries.FirstOrDefault(e => e.IsToday) ?? WeekEntries.FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Opens the log file viewer window to display the raw persisted log contents.
+    /// The window is shown modelessly so the user can continue editing while reading or copying the file.
+    /// </summary>
+    private void OpenLogFileViewer()
+    {
+        var viewer = new LogFileViewerWindow
+        {
+            Owner = Application.Current?.MainWindow
+        };
+
+        viewer.Show();
     }
 
     /// <summary>

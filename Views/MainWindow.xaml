@@ -80,13 +80,28 @@
                             ToolTip="Jump to the current work week"/>
                 </StackPanel>
 
-                <!-- Save button -->
-                <Button Grid.Column="2"
-                        Content="💾  Save Now"
-                        Style="{StaticResource PrimaryButtonStyle}"
-                        Command="{Binding SaveCommand}"
-                        ToolTip="Save all unsaved entries (Ctrl+S)"
-                        IsEnabled="{Binding HasUnsavedChanges}"/>
+                <!-- Header actions -->
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <Button Command="{Binding ViewLogFileCommand}"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Foreground="White"
+                            BorderBrush="White"
+                            ToolTip="View and copy the raw log file contents"
+                            Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📄" Margin="0,0,5,0"/>
+                            <TextBlock Text="View Log"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Content="💾  Save Now"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Command="{Binding SaveCommand}"
+                            ToolTip="Save all unsaved entries (Ctrl+S)"
+                            IsEnabled="{Binding HasUnsavedChanges}"/>
+                </StackPanel>
             </Grid>
         </Border>
 
