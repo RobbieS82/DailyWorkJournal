@@ -65,7 +65,7 @@
                 BorderBrush="{StaticResource BorderBrush}"
                 BorderThickness="1"
                 CornerRadius="6">
-            <TextBox Text="{Binding LogFileContent}"
+            <TextBox Text="{Binding LogFileContent, Mode=OneWay}"
                      IsReadOnly="True"
                      AcceptsReturn="True"
                      TextWrapping="NoWrap"
