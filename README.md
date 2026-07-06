@@ -59,6 +59,7 @@ Or open `DailyWorkJournal.slnx` in **Visual Studio 2022** (or later) and press *
 - 🟠 **Dirty-state indicator** — a small orange dot appears on a day's tab when it has unsaved changes.
 - ✅ **Status bar** — shows the last save timestamp or an "Unsaved changes" warning at all times.
 - 🔍 **AI-friendly log format** — the aggregate `.log` file uses clear delimiters that are trivial to parse with regex or to pass directly to an AI summarization service.
+- 📄 **View and copy log file** — open a dedicated window to inspect and copy the raw log file contents for sharing or AI summarization.
 - 🏠 **First-run setup** — the application automatically creates the `%APPDATA%\DailyWorkJournal\logs\` directory on first launch.
 - ⌨️ **Ctrl+S keyboard shortcut** — save all dirty entries without touching the mouse.
 
@@ -272,6 +273,22 @@ Because the file uses consistent, clearly-named delimiters and ISO dates, you ca
 - *"What recurring topics appeared across the last two weeks?"*
 - *"Draft a status report based on my entries for July."*
 
+### Viewing the Raw Log File
+
+Click the **📄 View Log** button in the main window header to open a dedicated viewer for the complete log file contents.
+
+- **Copy All** copies the entire raw log to the clipboard with one click.
+- **Refresh** reloads the file from disk so the viewer reflects the latest saved changes.
+- The viewer uses a monospace font and horizontal scrolling so the structured delimiter format is easy to read and copy.
+- The status bar shows entry count, character count, and the full file path for the loaded log.
+
+This makes it easy to:
+
+- Copy your full work history into AI services such as ChatGPT or Claude
+- Extract a specific week or month from the stored log
+- Share the exact persisted log format with a colleague or manager
+- Review the raw file without leaving the application
+
 ---
 
 ## Development Guide
@@ -290,10 +307,13 @@ DailyWorkJournal/
 │   ├── ViewModelBase.cs     # INotifyPropertyChanged base + SetProperty<T>
 │   ├── RelayCommand.cs      # ICommand delegate implementation
 │   ├── LogEntryViewModel.cs # Per-day VM: Content, IsDirty, MarkSaved
+│   ├── LogFileViewerViewModel.cs # Raw log viewer VM: copy / refresh / status
 │   └── MainViewModel.cs     # Root VM: week state, commands, save logic
 ├── Views/
 │   ├── MainWindow.xaml      # UI layout (WPF XAML)
-│   └── MainWindow.xaml.cs   # Code-behind (Closing / Calendar events only)
+│   ├── MainWindow.xaml.cs   # Code-behind (Closing / Calendar events only)
+│   ├── LogFileViewerWindow.xaml # Read-only raw log viewer UI
+│   └── LogFileViewerWindow.xaml.cs # Minimal viewer window code-behind
 ├── App.xaml                 # Application resources & styles
 ├── App.xaml.cs              # Application entry point
 ├── AssemblyInfo.cs          # Assembly metadata
