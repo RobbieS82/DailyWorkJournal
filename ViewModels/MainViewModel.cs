@@ -20,7 +20,11 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
     // Fields
     // ──────────────────────────────────────────────────────────────────────────
 
-    /// <summary>All entries loaded from the log file, keyed by <c>yyyy-MM-dd</c>.</summary>
+    /// <summary>
+    /// All entries loaded from the log file, keyed by <c>yyyy-MM-dd</c>.
+    /// All reads and writes occur on the UI thread (commands + DispatcherTimer),
+    /// so no additional synchronisation is required.
+    /// </summary>
     private Dictionary<string, LogEntry> _allEntries;
 
     /// <summary>The auto-save service instance managed by this view-model.</summary>
@@ -194,9 +198,14 @@ public sealed class MainViewModel : ViewModelBase, IDisposable
             {
                 vm.MarkSaved(); // flush VM content into model, clear dirty flag
                 return vm.Model;
-            });
+            }).ToList();
 
             LogFileService.SaveEntries(modelsToSave);
+
+            // Keep the in-memory cache in sync so that navigating away and back
+            // to this week correctly repopulates the entry textboxes.
+            foreach (LogEntry saved in modelsToSave)
+                _allEntries[saved.Date.ToString("yyyy-MM-dd")] = saved;
 
             LastSaveTime = DateTime.Now;
             HasUnsavedChanges = false;
