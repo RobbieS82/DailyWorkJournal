@@ -1,0 +1,335 @@
+﻿<Window x:Class="DailyWorkJournal.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:DailyWorkJournal.ViewModels"
+        mc:Ignorable="d"
+        Title="Daily Work Journal"
+        Height="760" Width="1180"
+        MinHeight="600" MinWidth="900"
+        Background="{StaticResource BackgroundBrush}"
+        FontFamily="Segoe UI"
+        Closing="Window_Closing">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <DockPanel>
+
+        <!-- ══════════════════════════════════════════════════════════════════
+             TITLE BAR / HEADER
+             ══════════════════════════════════════════════════════════════════ -->
+        <Border DockPanel.Dock="Top"
+                Background="{StaticResource PrimaryBrush}"
+                Padding="16,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- App title -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="📓" FontSize="22" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBlock Text="Daily Work Journal"
+                               Foreground="White"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Week navigation (centre) -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+
+                    <Button Content="◀"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Foreground="White"
+                            BorderBrush="White"
+                            Padding="10,5"
+                            Command="{Binding PreviousWeekCommand}"
+                            ToolTip="Previous week"/>
+
+                    <TextBlock Text="{Binding WeekLabel}"
+                               Foreground="White"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               Margin="16,0"/>
+
+                    <Button Content="▶"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Foreground="White"
+                            BorderBrush="White"
+                            Padding="10,5"
+                            Command="{Binding NextWeekCommand}"
+                            ToolTip="Next week"/>
+
+                    <Button Content="Today"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Foreground="White"
+                            BorderBrush="White"
+                            Padding="10,5"
+                            Margin="12,0,0,0"
+                            Command="{Binding GoToTodayCommand}"
+                            ToolTip="Jump to the current work week"/>
+                </StackPanel>
+
+                <!-- Save button -->
+                <Button Grid.Column="2"
+                        Content="💾  Save Now"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Command="{Binding SaveCommand}"
+                        ToolTip="Save all unsaved entries (Ctrl+S)"
+                        IsEnabled="{Binding HasUnsavedChanges}"/>
+            </Grid>
+        </Border>
+
+        <!-- ══════════════════════════════════════════════════════════════════
+             STATUS BAR
+             ══════════════════════════════════════════════════════════════════ -->
+        <Border DockPanel.Dock="Bottom"
+                Background="{StaticResource PrimaryBrush}"
+                Padding="16,6">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="{Binding StatusMessage}"
+                           Foreground="#B0BEC5"
+                           FontSize="12"
+                           VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Column="1"
+                           Text="Auto-save: every 5 minutes"
+                           Foreground="#607D8B"
+                           FontSize="11"
+                           VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- ══════════════════════════════════════════════════════════════════
+             MAIN CONTENT AREA
+             ══════════════════════════════════════════════════════════════════ -->
+        <Grid Margin="12">
+            <Grid.ColumnDefinitions>
+                <!-- Calendar sidebar -->
+                <ColumnDefinition Width="220"/>
+                <!-- Main journal area -->
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ════════════════════════════════════════════════
+                 LEFT SIDEBAR – Calendar
+                 ════════════════════════════════════════════════ -->
+            <Border Grid.Column="0"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Margin="0,0,10,0"
+                    Padding="8">
+                <StackPanel>
+                    <TextBlock Text="Calendar"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="4,4,4,8"/>
+
+                    <!-- WPF built-in Calendar control -->
+                    <Calendar x:Name="MainCalendar"
+                              SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                              DisplayDateStart="2020-01-01"
+                              HorizontalAlignment="Center"
+                              SelectedDatesChanged="Calendar_SelectedDatesChanged"/>
+
+                    <Separator Margin="4,12"/>
+
+                    <TextBlock Text="Quick Jump"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               Margin="4,0,4,6"/>
+
+                    <Button Content="← Previous Week"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            HorizontalAlignment="Stretch"
+                            Margin="0,0,0,6"
+                            Command="{Binding PreviousWeekCommand}"/>
+
+                    <Button Content="Today's Week →"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            HorizontalAlignment="Stretch"
+                            Margin="0,0,0,6"
+                            Command="{Binding GoToTodayCommand}"/>
+
+                    <Button Content="Next Week →"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            HorizontalAlignment="Stretch"
+                            Command="{Binding NextWeekCommand}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ════════════════════════════════════════════════
+                 RIGHT AREA – Week journal entries
+                 ════════════════════════════════════════════════ -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <!-- Day tabs -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Entry panels -->
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Day selector tabs -->
+                <ItemsControl Grid.Row="0"
+                              ItemsSource="{Binding WeekEntries}"
+                              Margin="0,0,0,8">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Rows="1"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Margin="2,0"
+                                    Padding="0,10"
+                                    Command="{Binding DataContext.NavigateToDateCommand,
+                                              RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding Date}"
+                                    Cursor="Hand"
+                                    ToolTip="{Binding FullDayLabel}">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                                        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                                        <Setter Property="BorderThickness" Value="1"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border Background="{TemplateBinding Background}"
+                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                                            CornerRadius="4,4,0,0">
+                                                        <ContentPresenter HorizontalAlignment="Center"
+                                                                          VerticalAlignment="Center"/>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Background" Value="#EBF5FB"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <!-- Highlight today's tab -->
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsToday}" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource TodayBrush}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource TodayBorderBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding DayName}"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"
+                                               HorizontalAlignment="Center"
+                                               Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="{Binding Date, StringFormat={}{0:MMM d}}"
+                                               FontSize="11"
+                                               HorizontalAlignment="Center"
+                                               Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <!-- Dirty indicator dot -->
+                                    <Ellipse Width="6" Height="6"
+                                             HorizontalAlignment="Center"
+                                             Margin="0,3,0,0">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Setter Property="Fill" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsDirty}" Value="True">
+                                                        <Setter Property="Fill" Value="{StaticResource WarningBrush}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                </StackPanel>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Five-column entry panels (Mon–Fri) -->
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding WeekEntries}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Rows="1"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="2,0"
+                                    BorderThickness="1"
+                                    CornerRadius="0,0,4,4">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                                        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsToday}" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource TodayBrush}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource TodayBorderBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <DockPanel Margin="8">
+                                    <!-- Day header inside the panel -->
+                                    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,6">
+                                        <TextBlock Text="{Binding DayLabel}"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"/>
+                                        <TextBlock FontSize="10"
+                                                   Foreground="{StaticResource TextSecondaryBrush}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Text" Value=""/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsToday}" Value="True">
+                                                            <Setter Property="Text" Value="Today"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                    <!-- Placeholder text shown when entry is empty and unfocused -->
+                                    <TextBox Style="{StaticResource JournalTextBoxStyle}"
+                                             Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}"
+                                             AcceptsReturn="True"
+                                             TextWrapping="Wrap"
+                                             VerticalScrollBarVisibility="Auto"
+                                             HorizontalScrollBarVisibility="Disabled"
+                                             ToolTip="Enter your work notes for this day. Use • for bullet points."/>
+                                </DockPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </Grid>
+    </DockPanel>
+</Window>
