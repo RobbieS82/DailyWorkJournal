@@ -27,7 +27,7 @@ public sealed class LogFileViewerViewModel : ViewModelBase
     {
         CopyAllCommand = new RelayCommand(CopyToClipboard, () => !string.IsNullOrEmpty(LogFileContent));
         RefreshCommand = new RelayCommand(RefreshContent);
-        CloseCommand = new RelayCommand(CloseWindow);
+        CloseCommand = new RelayCommand(() => RequestClose?.Invoke());
 
         LoadLogFileContent();
     }
@@ -68,9 +68,15 @@ public sealed class LogFileViewerViewModel : ViewModelBase
 
     /// <summary>
     /// Gets the command that closes the viewer window.
-    /// The command parameter is expected to be the owning <see cref="Window"/>.
     /// </summary>
     public ICommand CloseCommand { get; }
+
+    /// <summary>
+    /// Gets or sets the callback invoked by <see cref="CloseCommand"/> to close the owning window.
+    /// Set this from the View's code-behind after <c>InitializeComponent</c> to avoid any
+    /// ViewModel-to-View type dependency.
+    /// </summary>
+    public Action? RequestClose { get; set; }
 
     /// <summary>
     /// Loads the log file content from disk and updates the view state.
@@ -127,16 +133,6 @@ public sealed class LogFileViewerViewModel : ViewModelBase
     private void RefreshContent()
     {
         LoadLogFileContent();
-    }
-
-    /// <summary>
-    /// Closes the viewer window when a valid <see cref="Window"/> parameter is supplied.
-    /// </summary>
-    /// <param name="parameter">The window instance to close.</param>
-    private void CloseWindow(object? parameter)
-    {
-        if (parameter is Window window)
-            window.Close();
     }
 
     /// <summary>

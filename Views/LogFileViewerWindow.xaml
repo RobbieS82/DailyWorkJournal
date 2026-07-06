@@ -53,7 +53,6 @@
                 <Separator/>
 
                 <Button Command="{Binding CloseCommand}"
-                        CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                         ToolTip="Close this viewer window"
                         Padding="10,5">
                     <TextBlock Text="Close"/>
